@@ -19,6 +19,7 @@
 #define PIPE_WRITE 1
 #define PIPE_READ 0
 #define TENMILLISEC 10000
+#define MAX_DNS_NAME_LENGTH 50
 #define DELAY_FOR_HOST_REPLY 10 /* Delay in ten of milliseconds */
 
 void display_host(struct man_port_at_man *list,
@@ -221,6 +222,25 @@ int file_upload(struct man_port_at_man *curr_host)
 	usleep(TENMILLISEC);
 }
 
+int file_download(struct man_port_at_man *curr_host)
+{
+	int n, k;
+	int host_id;
+	int host_or_name;
+	char domain_name[MAX_DNS_NAME_LENGTH];
+	char reply[MAN_MSG_LENGTH];
+	char name[NAME_LENGTH];
+	char msg[NAME_LENGTH];
+	printf("Enter file name to download: ");
+	scanf("%s", name);
+	printf("Enter host id of destination:  ");
+	scanf("%d", &host_id);
+	printf("\n");
+	n = sprintf(msg, "d %d %s", host_id, name); // send msg to host
+	write(curr_host->send_fd, msg, n);
+	usleep(TENMILLISEC);
+}
+
 /*****************************
  * Main loop of the manager  *
  *****************************/
@@ -264,7 +284,7 @@ void man_main()
 			file_upload(curr_host);
 			break;
 		case 'd': /* Download a file from a host */
-			printf("This command is not implemented\n");
+			file_download(curr_host);
 			break;
 		case 'q': /* Quit */
 			return;
